@@ -10,6 +10,7 @@ namespace TravelLogCapstone.Models
     {
         [Key]
         public int RestaurantId { get; set; }
+        public string Name { get; set; }
         public string Address { get; set; }
         public string FoodEaten { get; set; }
         public string DrinksConsumed { get; set; }

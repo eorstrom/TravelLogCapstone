@@ -12,39 +12,111 @@ using Microsoft.AspNetCore.Cors;
 
 namespace TravelLogCapstone.Controllers
 {
-    [Route("api/[controller]")]
-    public class AppUsersController : Controller
-    {
-        // GET: api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
+        [Route("api/[controller]")]
+        [Produces("application/json")]
+        [EnableCors("AllowDevelopmentEnvironment")]
+        public class AppUsersController : Controller
         {
-            return new string[] { "value1", "value2" };
-        }
+            private TravelLogContext _context;
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
+            public AppUsersController(TravelLogContext context)
+            {
+                _context = context;
+            }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
+            // GET: api/values
+            [HttpGet]
+            public IActionResult Get([FromQuery] string username)
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
+                IQueryable<AppUsers> users = from user in _context.AppUsers
+                                                 select new AppUsers
+                                                 {
+                                                     AppUserId = user.AppUserId,
+                                                     Username = user.Username,
+                                                     Email = user.Email
+                                                 };
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+                if (username != null)
+                {
+                    users = users.Where(g => g.Username == username);
+                }
+
+                if (users == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(users);
+            }
+
+            // GET api/values/5
+            [HttpGet("{id}", Name = "GetAppUser")]
+            public string Get(int id)
+            {
+                return "value";
+            }
+
+            // POST api/values
+            [HttpPost]
+            public IActionResult Post([FromBody]AppUsers user)
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+
+                var existingUser = from u in _context.AppUsers
+                                   where u.Username == user.Username
+                                   select u;
+
+                if (existingUser.Count<AppUsers>() > 0)
+                {
+                    return new StatusCodeResult(StatusCodes.Status409Conflict);
+                }
+
+
+                _context.AppUsers.Add(user);
+
+                try
+                {
+                    _context.SaveChanges();
+                }
+                catch (DbUpdateException)
+                {
+                    if (UserExists(user.AppUserId))
+                    {
+                        return new StatusCodeResult(StatusCodes.Status409Conflict);
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+                return CreatedAtRoute("GetAppUser", new { id = user.AppUserId }, user);
+            }
+
+            // PUT api/values/5
+            [HttpPut("{id}")]
+            public void Put(int id, [FromBody]string value)
+            {
+            }
+
+            // DELETE api/values/5
+            [HttpDelete("{id}")]
+            public void Delete(int id)
+            {
+            }
+
+            private bool UserExists(int id)
+            {
+                return _context.AppUsers.Count(e => e.AppUserId == id) > 0;
+            }
         }
     }
-}

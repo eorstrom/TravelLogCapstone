@@ -13,17 +13,51 @@ using Microsoft.AspNetCore.Cors;
 namespace TravelLogCapstone.Controllers
 {
     [Route("api/[controller]")]
+    [Produces("application/json")]
+    [EnableCors("AllowDevelopmentEnvironment")]
     public class RestaurantsController : Controller
     {
+        private TravelLogContext _context;
+
+        public RestaurantsController(TravelLogContext context)
+        {
+            _context = context;
+        }
+
         // GET: api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IActionResult Get([FromQuery] string name)
         {
-            return new string[] { "value1", "value2" };
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            IQueryable<Restaurants> restaurants = from restaurant in _context.Restaurants
+                                                  select new Restaurants
+                                                  {
+                                                      RestaurantId = restaurant.RestaurantId,
+                                                      Name = restaurant.Name,
+                                                      Address = restaurant.Address,
+                                                      FoodCategory = restaurant.FoodCategory
+                                                  };
+
+            if (name != null)
+            {
+                restaurants = restaurants.Where(g => g.Name == name);
+            }
+
+            //if (Restaurants == null)
+            {
+                //    return NotFound();
+                //}
+
+                return Ok(restaurants);
+            }
         }
 
         // GET api/values/5
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetRestaurants")]
         public string Get(int id)
         {
             return "value";
@@ -31,8 +65,43 @@ namespace TravelLogCapstone.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]string value)
+        public IActionResult Post([FromBody]Restaurants restaurant)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+
+            var existingRestaurant = from r in _context.Restaurants
+                               where r.Name == r.Name
+                               select r;
+
+            if (existingRestaurant.Count<Restaurants>() > 0)
+            {
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
+            }
+
+
+            _context.Restaurants.Add(restaurant);
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (DbUpdateException)
+            {
+                if (RestaurantExists(restaurant.RestaurantId))
+                {
+                    return new StatusCodeResult(StatusCodes.Status409Conflict);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtRoute("GetRestaurants", new { id = restaurant.RestaurantId }, restaurant);
         }
 
         // PUT api/values/5
@@ -45,6 +114,11 @@ namespace TravelLogCapstone.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+        }
+
+        private bool RestaurantExists(int id)
+        {
+            return _context.Restaurants.Count(e => e.RestaurantId == id) > 0;
         }
     }
 }

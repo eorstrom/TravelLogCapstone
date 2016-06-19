@@ -8,9 +8,10 @@ using TravelLogCapstone.Models;
 namespace TravelLogCapstone.Migrations
 {
     [DbContext(typeof(TravelLogContext))]
-    partial class TravelLogContextModelSnapshot : ModelSnapshot
+    [Migration("20160619040756_AddNameToRestaurantClass")]
+    partial class AddNameToRestaurantClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rc2-20901")
