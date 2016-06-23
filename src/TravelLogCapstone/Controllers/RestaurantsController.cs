@@ -87,14 +87,14 @@ namespace TravelLogCapstone.Controllers
             }
 
 
-            var existingRestaurant = from r in _context.Restaurants
-                               where r.Name == r.Name
-                               select r;
+            //var existingRestaurant = from r in _context.Restaurants
+            //                         where r.Name == r.Name
+            //                         select r;
 
-            if (existingRestaurant.Count<Restaurants>() > 0)
-            {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+            //if (existingRestaurant.Count<Restaurants>() > 0)
+            //{
+            //    return new StatusCodeResult(StatusCodes.Status409Conflict);
+            //}
 
 
             _context.Restaurants.Add(restaurant);

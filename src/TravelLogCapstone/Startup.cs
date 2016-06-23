@@ -38,16 +38,20 @@ namespace TravelLogCapstone
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowDevelopmentEnvironment",
-                    builder => builder
-                        .AllowAnyOrigin()
+                     //builder => builder.WithOrigins("http://localhost:8080")
+                     builder => builder
+                        .AllowAnyOrigin() //allows from anything(including virtual box)
                         .AllowAnyMethod()
                         .AllowAnyHeader());
+                //.WithMethods("DELETE, PUT, POST, GET, OPTIONS"));
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseCors(builder =>
+                builder.WithOrigins("http://example.com"));
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
