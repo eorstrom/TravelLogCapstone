@@ -39,7 +39,9 @@ namespace TravelLogCapstone.Controllers
                                                       RestaurantId = restaurant.RestaurantId,
                                                       Name = restaurant.Name,
                                                       Address = restaurant.Address,
-                                                      FoodCategory = restaurant.FoodCategory
+                                                      FoodCategory = restaurant.FoodCategory,
+                                                      Visited = restaurant.Visited,
+                                                      CityId = restaurant.CityId
                                                   };
 
             if (name != null)
@@ -57,10 +59,22 @@ namespace TravelLogCapstone.Controllers
         }
 
         // GET api/values/5
-        [HttpGet("{id}", Name = "GetRestaurants")]
-        public string Get(int id)
+        [HttpGet("{id}", Name = "GetRestaurant")]
+        public IActionResult Get(int id)
         {
-            return "value";
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Restaurants restaurant = _context.Restaurants.Single(m => m.RestaurantId == id);
+
+            if (restaurant == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(restaurant);
         }
 
         // POST api/values
@@ -101,7 +115,7 @@ namespace TravelLogCapstone.Controllers
                 }
             }
 
-            return CreatedAtRoute("GetRestaurants", new { id = restaurant.RestaurantId }, restaurant);
+            return CreatedAtRoute("GetRestaurant", new { id = restaurant.RestaurantId }, restaurant);
         }
 
         // PUT api/values/5
