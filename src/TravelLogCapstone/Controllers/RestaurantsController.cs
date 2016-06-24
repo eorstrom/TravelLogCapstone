@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
 using TravelLogCapstone.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Cors;
+
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -46,16 +47,15 @@ namespace TravelLogCapstone.Controllers
 
             if (name != null)
             {
-                restaurants = restaurants.Where(g => g.Name == name);
+                restaurants = restaurants.Where(r => r.Name == name);
             }
 
             //if (Restaurants == null)
-            {
+            // {
                 //    return NotFound();
                 //}
 
                 return Ok(restaurants);
-            }
         }
 
         // GET api/values/5
@@ -67,7 +67,7 @@ namespace TravelLogCapstone.Controllers
                 return BadRequest(ModelState);
             }
 
-            Restaurants restaurant = _context.Restaurants.Single(m => m.RestaurantId == id);
+            Restaurants restaurant = _context.Restaurants.Single(r => r.RestaurantId == id);
 
             if (restaurant == null)
             {
@@ -120,19 +120,63 @@ namespace TravelLogCapstone.Controllers
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
+        //public IActionResult Put(int id, [FromBody] Restaurants restaurant)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(ModelState);
+        //    }
+
+        //    if (id !=restaurant.RestaurantId)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    _context.Entry(restaurant).State = EntityState.Modified;
+
+        //    try
+        //    {
+        //        _context.SaveChanges();
+        //    }
+        //    catch (DbUpdateConcurrencyException)
+        //    {
+        //        if (!RestaurantExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+
+        //    return new StatusCodeResult(StatusCodes.Status204NoContent);
+        //}
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Restaurants restaurant = _context.Restaurants.Single(r => r.RestaurantId == id);
+            if (restaurant == null)
+            {
+                return NotFound();
+            }
+
+            _context.Restaurants.Remove(restaurant);
+            _context.SaveChanges();
+
+            return Ok(restaurant);
         }
 
         private bool RestaurantExists(int id)
         {
-            return _context.Restaurants.Count(e => e.RestaurantId == id) > 0;
+            return _context.Restaurants.Count(r => r.RestaurantId == id) > 0;
         }
     }
 }
