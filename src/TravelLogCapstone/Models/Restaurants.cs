@@ -19,6 +19,7 @@ namespace TravelLogCapstone.Models
         public int CleanlinessRating { get; set; }
         public string FoodCategory { get; set; }
         public string UserNotes { get; set; }
+        public bool Visited { get; set; }
         public int CityId { get; set; }
         public Cities Cities { get; set; }
     }
