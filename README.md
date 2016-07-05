@@ -12,8 +12,8 @@ Future plans for upgrades to be made:
 3. After the location has been added, show the added information in the list without the user needed to refresh the page.
 
 ### How to Run
-This repo should be cloned along with my TravelLogCapstone repo. This repo is for the front-end, user interaction. The other repo is the backend database for saving user input.   
+This repo should be cloned along with my Travel-Log-Capstone-Client repo. This repo is the backend database for saving user input. The other repo is for the front-end, user interaction.   
 
-1. Clone the Travel-Log-Capstone-Client repo.
-2. 
+You will probably need to change the connection string in your Startup.cs file to match the location of the database on your local machine.
+You will probably also need to add an initial migration using the Models included in the project. Then Update-Database to create the database on your local machine.
 
